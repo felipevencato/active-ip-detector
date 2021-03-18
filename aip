@@ -1,6 +1,6 @@
 #!/bin/bash
 newip=$(ip r | awk '/^d/{print $3}')
 for ip in ${newip%[0-9]}{1..255};do
-	ping -c1 $ip > /dev/null 
+	ping -c1 -w1 $ip > /dev/null
 	[ $? == 0 ] && echo "$ip: Active" || echo "$ip: Inactive"
 done
