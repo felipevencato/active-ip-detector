@@ -1,0 +1,10 @@
+#!/bin/bash
+newip=$(route -n | awk ' $4 == "UG" { print $2 } ' | cut -d'.' -f1-3)
+for ip in `seq 1 255`; do
+	ping -c1 $newip.$ip > /dev/null 
+	if [ $? == 0 ];then
+	       echo "$newip.$ip: Ativo"
+       	else
+	       echo "$newip.$ip: Inativo"
+	fi
+done
