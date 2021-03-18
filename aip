@@ -1,6 +1,11 @@
 #!/bin/bash
-newip=$(ip r | awk '/^d/{print $3}')
-for ip in ${newip%[0-9]}{1..255};do
-	ping -c1 -w1 $ip > /dev/null
-	[ $? == 0 ] && echo "$ip: Active" || echo "$ip: Inactive"
-done
+[ ! $1 ] && { # If invoked without arguments, do a recursive call
+	ip=$(ip r | awk '/^d/{print $3}') # Find default route IP
+	> /tmp/aip.log # Clean log file
+	# Send a list of IPs to xargs that calls multiple instances of ping
+	echo ${ip%[0-9]}{1..254} | xargs -n1 -P0 $0
+	cat /tmp/aip.log | sort -n
+	exit 0
+}
+ping -c1 -w1 $1 > /dev/null
+[ $? == 0 ] && echo "$1: Ativo" >> /tmp/aip.log
